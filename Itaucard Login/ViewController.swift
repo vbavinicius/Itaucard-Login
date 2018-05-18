@@ -28,6 +28,7 @@ class ViewController: UIViewController {
     var passwordTopConstraint: NSLayoutConstraint!
     var passwordHeightConstraint: NSLayoutConstraint!
     
+    
     // Variables
     var isEditingTextField: Bool = false
     var isMoreThanZeroDigits: Bool = false
@@ -94,9 +95,11 @@ class ViewController: UIViewController {
         
         passwordTopConstraint.isActive = true
         passwordBottomConstraint.isActive = false
-        
+
         passwordLeftConstraint.isActive = false
         passwordLeft2Constraint.isActive = true
+        
+ 
         
         UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
             
@@ -126,9 +129,11 @@ class ViewController: UIViewController {
             
             passwordTopConstraint.isActive = false
             passwordBottomConstraint.isActive = true
-            
+//
             passwordLeft2Constraint.isActive = false
             passwordLeftConstraint.isActive = true
+            
+
             
             UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
                 
@@ -157,8 +162,6 @@ class ViewController: UIViewController {
         passwordLeftConstraint = NSLayoutConstraint(item: passwordLabel, attribute: .leading, relatedBy: .equal, toItem: passwordLabel.superview, attribute: .leading, multiplier: 1, constant: 0)
         
         passwordLeft2Constraint = NSLayoutConstraint(item: passwordLabel, attribute: .leading, relatedBy: .equal, toItem: passwordLabel.superview, attribute: .leading, multiplier: 1, constant: distance)
-        
-//        passwordBottomConstraint = NSLayoutConstraint(item: passwordLabel, attribute: .bottom, relatedBy: .equal, toItem: lineView, attribute: .top, multiplier: 1, constant: -10)
         
         passwordBottomConstraint = NSLayoutConstraint(item: passwordLabel, attribute: .bottom, relatedBy: .equal, toItem: tappableView, attribute: .bottom, multiplier: 1, constant: -26)
         
@@ -215,11 +218,11 @@ class ViewController: UIViewController {
 extension ViewController: UITextFieldDelegate {
 
     // Limit text field lenght to 4 digits
-//    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-//        guard let text = textField.text else { return true }
-//
-//        let newLength = text.count + string.count - range.length
-//
-//        return newLength <= 4 // Bool
-//    }
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard let text = textField.text else { return true }
+
+        let newLength = text.count + string.count - range.length
+
+        return newLength <= 4 // Bool
+    }
 }
