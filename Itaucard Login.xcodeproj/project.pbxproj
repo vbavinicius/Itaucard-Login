@@ -13,6 +13,7 @@
 		8012705F20A4C180006422DD /* Itaucard_Login.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8012705D20A4C180006422DD /* Itaucard_Login.xcdatamodeld */; };
 		8012706120A4C181006422DD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8012706020A4C181006422DD /* Assets.xcassets */; };
 		8012706420A4C181006422DD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8012706220A4C181006422DD /* LaunchScreen.storyboard */; };
+		80D9104B20B0663000A1C869 /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D9104A20B0663000A1C869 /* SecondViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		8012706020A4C181006422DD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8012706320A4C181006422DD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8012706520A4C181006422DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		80D9104A20B0663000A1C869 /* SecondViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +60,7 @@
 			children = (
 				8012705620A4C180006422DD /* AppDelegate.swift */,
 				8012705820A4C180006422DD /* ViewController.swift */,
+				80D9104A20B0663000A1C869 /* SecondViewController.swift */,
 				8012705A20A4C180006422DD /* Main.storyboard */,
 				8012706020A4C181006422DD /* Assets.xcassets */,
 				8012706220A4C181006422DD /* LaunchScreen.storyboard */,
@@ -138,6 +141,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				80D9104B20B0663000A1C869 /* SecondViewController.swift in Sources */,
 				8012705920A4C180006422DD /* ViewController.swift in Sources */,
 				8012705F20A4C180006422DD /* Itaucard_Login.xcdatamodeld in Sources */,
 				8012705720A4C180006422DD /* AppDelegate.swift in Sources */,

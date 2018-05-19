@@ -20,6 +20,9 @@ class ViewController: UIViewController {
     @IBOutlet weak var lineView: UIView!
     @IBOutlet weak var tappableView: UIView!
     @IBOutlet weak var loginButton: UIButton!
+    @IBOutlet weak var logoWrapper: UIView!
+    @IBOutlet weak var headerView: UIView!
+    @IBOutlet weak var middleView: UIView!
     
     // Constraints
     var passwordLeftConstraint: NSLayoutConstraint!
@@ -66,6 +69,40 @@ class ViewController: UIViewController {
         let mainViewTapGesture = UITapGestureRecognizer(target: self, action: #selector(stopEditing(gesture:)))
         self.view.addGestureRecognizer(mainViewTapGesture)
         self.view.isUserInteractionEnabled = true
+        
+        // Create keyboard notification
+        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillShow(notification:)), name: Notification.Name.UIKeyboardWillShow, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillHide(notification:)), name: Notification.Name.UIKeyboardWillHide, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillChange(notification:)), name: Notification.Name.UIKeyboardWillChangeFrame, object: nil)
+        
+        // Login button corner radius
+        loginButton.layer.cornerRadius = 5
+        loginButton.layer.masksToBounds = true
+        loginButton.clipsToBounds = true
+    }
+    
+    // Keyboard functions
+    @objc func handleKeyboardWillShow(notification: Notification) {
+        print("show")
+        UIView.animate(withDuration: 0.3) {
+            self.headerView.transform = CGAffineTransform(translationX: 0, y: -self.logoWrapper.frame.maxY)
+            self.middleView.transform = CGAffineTransform(translationX: 0, y: -self.logoWrapper.frame.maxY)
+        }
+    }
+    
+    @objc func handleKeyboardWillHide(notification: Notification) {
+        print("hide")
+        UIView.animate(withDuration: 0.3) {
+
+            self.headerView.transform = .identity
+            self.middleView.transform = .identity
+        }
+    }
+    
+    @objc func handleKeyboardWillChange(notification: Notification) {
+        print("change")
     }
 
     //VDA
@@ -77,7 +114,6 @@ class ViewController: UIViewController {
         NSLayoutConstraint.activate([passwordLeftConstraint, passwordHeightConstraint, passwordBottomConstraint])
         self.view.layoutIfNeeded()
     }
-    
     
     @objc func handleTap(gesture: UITapGestureRecognizer) {
         beginEditing()
@@ -129,11 +165,9 @@ class ViewController: UIViewController {
             
             passwordTopConstraint.isActive = false
             passwordBottomConstraint.isActive = true
-//
+            
             passwordLeft2Constraint.isActive = false
             passwordLeftConstraint.isActive = true
-            
-
             
             UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
                 
@@ -212,6 +246,35 @@ class ViewController: UIViewController {
         print("count: \(textFieldCount)")
     }
     
+    // IBAction methods
+    @IBAction func loginButtonDidPressed(_ sender: Any) {
+        print("button pressed")
+        endEditing()
+        
+        UIView.animate(withDuration: 0.3, animations: {
+            self.loginButton.frame.origin.x = (self.tappableView.frame.width / 2) - 25
+            self.loginButton.frame.size.width = 50
+            self.loginButton.layer.cornerRadius = 25
+            self.loginButton.setTitle("", for: .normal)
+        }) { (_) in
+            
+            let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.white)
+
+            self.loginButton.addSubview(activityIndicator)
+            
+            activityIndicator.center = self.loginButton.convert(self.loginButton.center, from:self.loginButton.superview)
+            activityIndicator.startAnimating()
+            
+            Timer.scheduledTimer(withTimeInterval: 5, repeats: false, block: { (_) in
+                print("timer")
+                
+                let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SecondViewController")
+                self.present(vc, animated: true, completion: nil)
+            })
+        }
+        
+        
+    }
     
 }
 
