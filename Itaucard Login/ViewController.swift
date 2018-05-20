@@ -35,6 +35,10 @@ class ViewController: UIViewController {
     // Variables
     var isEditingTextField: Bool = false
     var isMoreThanZeroDigits: Bool = false
+    var activityIndicator: UIActivityIndicatorView!
+    
+    // Animator
+    let animator = TransitionObject()
     
     
     // VDL
@@ -115,12 +119,49 @@ class ViewController: UIViewController {
         self.view.layoutIfNeeded()
     }
     
+    
     @objc func handleTap(gesture: UITapGestureRecognizer) {
         beginEditing()
     }
     
     @objc func stopEditing(gesture: UIGestureRecognizer) {
         endEditing()
+    }
+    
+    func resetToInitialState() {
+        
+        NSLayoutConstraint.activate([passwordLeftConstraint, passwordHeightConstraint, passwordBottomConstraint])
+        NSLayoutConstraint.deactivate([passwordLeft2Constraint,passwordTopConstraint])
+        self.view.layoutIfNeeded()
+
+        isEditingTextField = false
+        
+        // Reset text
+        textField.text = ""
+        
+        // Reset all dots to white
+        for view in dotsStackView.subviews as [UIView] {
+            view.backgroundColor = .white
+        }
+        dotsStackView.alpha = 0.0
+        
+        // Reset constraints
+
+        passwordBottomConstraint.isActive = true
+        passwordLeftConstraint.isActive = true
+        
+        // Reset login button text
+        loginButton.setTitle("acessar", for: .normal)
+        loginButton.backgroundColor = .orange
+        loginButton.transform = CGAffineTransform.identity
+        loginButton.isEnabled = false
+        loginButton.frame.size.width = (loginButton.superview?.frame.width)!
+        loginButton.layer.cornerRadius = 5
+        loginButton.frame.origin.x = 0
+        
+        // Line
+        lineView.alpha = 1
+        
     }
     
     func beginEditing() {
@@ -188,7 +229,7 @@ class ViewController: UIViewController {
     // Create constraints
     func createPasswordLabelConstraints() {
         let distance = (tappableView.frame.width / 2) - (passwordLabel.frame.width / 2)
-        
+        print("distance: \(distance)")
         passwordLabel.translatesAutoresizingMaskIntoConstraints = false
         
         passwordHeightConstraint = NSLayoutConstraint(item: passwordLabel, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1, constant: 17)
@@ -258,17 +299,18 @@ class ViewController: UIViewController {
             self.loginButton.setTitle("", for: .normal)
         }) { (_) in
             
-            let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.white)
+            self.activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.white)
 
-            self.loginButton.addSubview(activityIndicator)
+            self.loginButton.addSubview(self.activityIndicator)
             
-            activityIndicator.center = self.loginButton.convert(self.loginButton.center, from:self.loginButton.superview)
-            activityIndicator.startAnimating()
+            self.activityIndicator.center = self.loginButton.convert(self.loginButton.center, from:self.loginButton.superview)
+            self.activityIndicator.startAnimating()
             
             Timer.scheduledTimer(withTimeInterval: 5, repeats: false, block: { (_) in
                 print("timer")
                 
                 let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SecondViewController")
+                vc.transitioningDelegate = self
                 self.present(vc, animated: true, completion: nil)
             })
         }
@@ -276,7 +318,10 @@ class ViewController: UIViewController {
         
     }
     
+    @IBAction func unwindToLogin(segue: UIStoryboardSegue) {}
+    
 }
+
 
 extension ViewController: UITextFieldDelegate {
 
@@ -288,4 +333,18 @@ extension ViewController: UITextFieldDelegate {
 
         return newLength <= 4 // Bool
     }
+}
+
+
+extension ViewController: UIViewControllerTransitioningDelegate {
+    
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return animator
+    }
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+
+        return nil
+    }
+    
 }

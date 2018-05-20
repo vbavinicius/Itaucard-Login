@@ -377,16 +377,29 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KAS-ed-Sp5">
+                                <rect key="frame" x="0.0" y="424" width="375" height="30"/>
+                                <state key="normal" title="Logout">
+                                    <color key="titleColor" red="1" green="0.14913141730000001" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <segue destination="Cy6-ab-yO0" kind="unwind" unwindAction="unwindToLoginWithSegue:" id="bfv-pP-pgG"/>
+                                </connections>
+                            </button>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="KAS-ed-Sp5" firstAttribute="top" secondItem="Cd6-BV-51Z" secondAttribute="bottom" constant="80" id="E3a-5t-2cM"/>
                             <constraint firstItem="Cd6-BV-51Z" firstAttribute="centerX" secondItem="0Os-k2-8g8" secondAttribute="centerX" id="KG7-bp-5fx"/>
+                            <constraint firstItem="VeM-F7-eJk" firstAttribute="trailing" secondItem="KAS-ed-Sp5" secondAttribute="trailing" id="Maa-8x-3BI"/>
                             <constraint firstItem="Cd6-BV-51Z" firstAttribute="centerY" secondItem="0Os-k2-8g8" secondAttribute="centerY" id="OEK-8o-hpy"/>
+                            <constraint firstItem="KAS-ed-Sp5" firstAttribute="leading" secondItem="VeM-F7-eJk" secondAttribute="leading" id="giT-I5-MPi"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="VeM-F7-eJk"/>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eQH-Tn-6QS" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="Cy6-ab-yO0" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="570" y="115"/>
         </scene>
