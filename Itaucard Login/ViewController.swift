@@ -25,21 +25,16 @@ class ViewController: UIViewController {
     @IBOutlet weak var middleView: UIView!
     
     // Constraints
-    var passwordLeftConstraint: NSLayoutConstraint!
-    var passwordLeft2Constraint: NSLayoutConstraint!
-    var passwordBottomConstraint: NSLayoutConstraint!
-    var passwordTopConstraint: NSLayoutConstraint!
-    var passwordHeightConstraint: NSLayoutConstraint!
-    
+    @IBOutlet var bottom: NSLayoutConstraint!
+    @IBOutlet var top: NSLayoutConstraint!
+    @IBOutlet var left: NSLayoutConstraint!
+    @IBOutlet var center: NSLayoutConstraint!
     
     // Variables
     var isEditingTextField: Bool = false
-    var isMoreThanZeroDigits: Bool = false
-    var activityIndicator: UIActivityIndicatorView!
     
     // Animator
     let animator = TransitionObject()
-    
     
     // VDL
     override func viewDidLoad() {
@@ -65,7 +60,7 @@ class ViewController: UIViewController {
         }
         
         // Tap gesture - tappable area
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(gesture:)))
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(beginEditing(gesture:)))
         tappableView.addGestureRecognizer(tapGesture)
         tappableView.isUserInteractionEnabled = true
         
@@ -76,20 +71,32 @@ class ViewController: UIViewController {
         
         // Create keyboard notification
         NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillShow(notification:)), name: Notification.Name.UIKeyboardWillShow, object: nil)
-        
         NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillHide(notification:)), name: Notification.Name.UIKeyboardWillHide, object: nil)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillChange(notification:)), name: Notification.Name.UIKeyboardWillChangeFrame, object: nil)
         
         // Login button corner radius
         loginButton.layer.cornerRadius = 5
         loginButton.layer.masksToBounds = true
         loginButton.clipsToBounds = true
+        
+        // Header View Gradient
+        //func setGradientBackground() {
+        let colorTop =  UIColor(red: 255.0/255.0, green: 149.0/255.0, blue: 0.0/255.0, alpha: 1.0).cgColor
+        let colorBottom = UIColor(red: 255.0/255.0, green: 94.0/255.0, blue: 58.0/255.0, alpha: 1.0).cgColor
+
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [colorTop, colorBottom]
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
+        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
+        gradientLayer.frame = self.headerView.frame
+        
+        headerView.clipsToBounds = true
+
+        self.headerView.layer.insertSublayer(gradientLayer, at: 0)
+        //}
     }
     
     // Keyboard functions
     @objc func handleKeyboardWillShow(notification: Notification) {
-        print("show")
         UIView.animate(withDuration: 0.3) {
             self.headerView.transform = CGAffineTransform(translationX: 0, y: -self.logoWrapper.frame.maxY)
             self.middleView.transform = CGAffineTransform(translationX: 0, y: -self.logoWrapper.frame.maxY)
@@ -97,150 +104,106 @@ class ViewController: UIViewController {
     }
     
     @objc func handleKeyboardWillHide(notification: Notification) {
-        print("hide")
         UIView.animate(withDuration: 0.3) {
-
             self.headerView.transform = .identity
             self.middleView.transform = .identity
         }
     }
-    
-    @objc func handleKeyboardWillChange(notification: Notification) {
-        print("change")
-    }
+
 
     //VDA
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        // Setup constraints after view did load
-        createPasswordLabelConstraints()
-        NSLayoutConstraint.activate([passwordLeftConstraint, passwordHeightConstraint, passwordBottomConstraint])
         self.view.layoutIfNeeded()
     }
     
-    
-    @objc func handleTap(gesture: UITapGestureRecognizer) {
-        beginEditing()
+    // Begin editing func
+    @objc func beginEditing(gesture: UITapGestureRecognizer) {
+        // Become responder
+        textField.becomeFirstResponder()
+        
+        // Check if is editing
+        guard !isEditingTextField else { return }
+        
+        // Deactive constraints
+        bottom.isActive = false
+        left.isActive = false
+        
+        // Animate
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
+            
+            // Layout if need
+            self.passwordLabel.layoutIfNeeded()
+            self.view.layoutIfNeeded()
+            
+            // Alphas
+            self.dotsStackView.alpha = 1
+            self.lineView.alpha = 0
+            
+            // Set editing to true
+        }) { (_) in
+            self.isEditingTextField = true
+        }
     }
     
+    // Stop editing view tap
     @objc func stopEditing(gesture: UIGestureRecognizer) {
         endEditing()
     }
     
+    // Reset to initial state
     func resetToInitialState() {
-        
-        NSLayoutConstraint.activate([passwordLeftConstraint, passwordHeightConstraint, passwordBottomConstraint])
-        NSLayoutConstraint.deactivate([passwordLeft2Constraint,passwordTopConstraint])
-        self.view.layoutIfNeeded()
 
-        isEditingTextField = false
+        // Constraints
+        bottom.isActive = true
+        left.isActive = true
         
-        // Reset text
-        textField.text = ""
-        
-        // Reset all dots to white
+        // Dots View
         for view in dotsStackView.subviews as [UIView] {
             view.backgroundColor = .white
+            view.layer.borderColor = UIColor.gray.cgColor
         }
         dotsStackView.alpha = 0.0
         
-        // Reset constraints
+        // Line View
+        lineView.alpha = 1.0
+        
+        // Button
+        self.loginButton.frame.origin.x = 0
+        self.loginButton.frame.size.width = tappableView.frame.width
+        self.loginButton.layer.cornerRadius = 5
+        self.loginButton.setTitle("acessar", for: .normal)
+        self.loginButton.isEnabled = false
+        
+        // Text Field
+        textField.text = ""
 
-        passwordBottomConstraint.isActive = true
-        passwordLeftConstraint.isActive = true
-        
-        // Reset login button text
-        loginButton.setTitle("acessar", for: .normal)
-        loginButton.backgroundColor = .orange
-        loginButton.transform = CGAffineTransform.identity
-        loginButton.isEnabled = false
-        loginButton.frame.size.width = (loginButton.superview?.frame.width)!
-        loginButton.layer.cornerRadius = 5
-        loginButton.frame.origin.x = 0
-        
-        // Line
-        lineView.alpha = 1
-        
+        // Layout if Needed
+        self.view.layoutIfNeeded()
     }
-    
-    func beginEditing() {
-        
-        textField.becomeFirstResponder()
-        
-        guard !isEditingTextField else { return }
-        
-        passwordTopConstraint.isActive = true
-        passwordBottomConstraint.isActive = false
 
-        passwordLeftConstraint.isActive = false
-        passwordLeft2Constraint.isActive = true
-        
- 
-        
-        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
-            
-            self.passwordLabel.layoutIfNeeded()
-            self.view.layoutIfNeeded()
-            
-            self.dotsStackView.alpha = 1
-            self.lineView.alpha = 0
-            
-        }) { (_) in
-            self.isEditingTextField = !self.isEditingTextField
-        }
-    }
-    
-    
+    // End editing func
     func endEditing() {
         
+        // Check if is editing the text
         guard isEditingTextField else {return}
         
+        // Resign responder
         textField.resignFirstResponder()
         
-        if isMoreThanZeroDigits {
-            
-        }
+        // Check if is typing
+        if textField.text?.count == 0 {
         
-        else if !isMoreThanZeroDigits {
-            
-            passwordTopConstraint.isActive = false
-            passwordBottomConstraint.isActive = true
-            
-            passwordLeft2Constraint.isActive = false
-            passwordLeftConstraint.isActive = true
-            
+            // Animate
             UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
                 
-                self.passwordLabel.layoutIfNeeded()
-                self.view.layoutIfNeeded()
-                
-                self.dotsStackView.alpha = 0
-                self.lineView.alpha = 1
-                
-            }) { (_) in
-                self.isEditingTextField = !self.isEditingTextField
-            }
-            
+                // Reset to initial state
+                self.resetToInitialState()
+            })
         }
-    }
-    
-
-    // Create constraints
-    func createPasswordLabelConstraints() {
-        let distance = (tappableView.frame.width / 2) - (passwordLabel.frame.width / 2)
-        print("distance: \(distance)")
-        passwordLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        passwordHeightConstraint = NSLayoutConstraint(item: passwordLabel, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1, constant: 17)
-        
-        passwordLeftConstraint = NSLayoutConstraint(item: passwordLabel, attribute: .leading, relatedBy: .equal, toItem: passwordLabel.superview, attribute: .leading, multiplier: 1, constant: 0)
-        
-        passwordLeft2Constraint = NSLayoutConstraint(item: passwordLabel, attribute: .leading, relatedBy: .equal, toItem: passwordLabel.superview, attribute: .leading, multiplier: 1, constant: distance)
-        
-        passwordBottomConstraint = NSLayoutConstraint(item: passwordLabel, attribute: .bottom, relatedBy: .equal, toItem: tappableView, attribute: .bottom, multiplier: 1, constant: -26)
-        
-        passwordTopConstraint = NSLayoutConstraint(item: passwordLabel, attribute: .top, relatedBy: .equal, toItem: passwordLabel.superview, attribute: .top, multiplier: 1, constant: 0)
+        // Set editing to false
+        self.isEditingTextField = false
     }
     
 
@@ -275,76 +238,97 @@ class ViewController: UIViewController {
         } else {
             loginButton.isEnabled = false
         }
-        
-        // Check if there more than zero digits
-        if textFieldCount > 0 {
-            isMoreThanZeroDigits = true
-        } else {
-            isMoreThanZeroDigits = false
-        }
-        
-        print("text: \(textField.text!)")
-        print("count: \(textFieldCount)")
     }
     
     // IBAction methods
     @IBAction func loginButtonDidPressed(_ sender: Any) {
-        print("button pressed")
         endEditing()
         
         UIView.animate(withDuration: 0.3, animations: {
+            
+            // Login Button animations
             self.loginButton.frame.origin.x = (self.tappableView.frame.width / 2) - 25
             self.loginButton.frame.size.width = 50
             self.loginButton.layer.cornerRadius = 25
             self.loginButton.setTitle("", for: .normal)
         }) { (_) in
             
-            self.activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.white)
-
-            self.loginButton.addSubview(self.activityIndicator)
+            // Activity Indicator
+            let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.white)
+            self.loginButton.addSubview(activityIndicator)
+            activityIndicator.center = self.loginButton.convert(self.loginButton.center, from:self.loginButton.superview)
+            activityIndicator.startAnimating()
             
-            self.activityIndicator.center = self.loginButton.convert(self.loginButton.center, from:self.loginButton.superview)
-            self.activityIndicator.startAnimating()
-            
-            Timer.scheduledTimer(withTimeInterval: 5, repeats: false, block: { (_) in
-                print("timer")
+            Timer.scheduledTimer(withTimeInterval: 3, repeats: false, block: { (_) in
                 
-                let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SecondViewController")
-                vc.transitioningDelegate = self
-                self.present(vc, animated: true, completion: nil)
+                // Remove activity indicator
+                activityIndicator.stopAnimating()
+                activityIndicator.removeFromSuperview()
+                
+                // Check password
+                if self.textField.text == "1234" {
+                
+                    let sucessImageView = UIImageView(frame: CGRect(x: 10, y: 10, width: 30, height: 30))
+                    sucessImageView.image = UIImage(named: "sucess")
+                    sucessImageView.alpha = 0
+                    self.loginButton.addSubview(sucessImageView)
+                    
+                    UIView.animateKeyframes(withDuration: 1.5, delay: 0, options: UIViewKeyframeAnimationOptions.calculationModeLinear, animations: {
+                        
+                        UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.1, animations: {
+                            sucessImageView.alpha = 1
+                        })
+                        
+                        UIView.addKeyframe(withRelativeStartTime: 0.9, relativeDuration: 0.1, animations: {
+                            sucessImageView.alpha = 0
+                        })
+                        
+                    }, completion: { (_) in
+                        
+                        let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SecondViewController")
+                        vc.transitioningDelegate = self
+                        self.present(vc, animated: true, completion: nil)
+                        
+                        sucessImageView.removeFromSuperview()
+                    })
+                }
+                
+                else {
+                    let alert = UIAlertController(title: "Senha incorreta", message: "Preencha a senha corretamente", preferredStyle: .alert)
+                    let action = UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil)
+                    alert.addAction(action)
+                    self.present(alert, animated: true, completion: {
+                        self.resetToInitialState()
+                    })
+                }
             })
         }
-        
-        
     }
     
+    // Unwind func
     @IBAction func unwindToLogin(segue: UIStoryboardSegue) {}
-    
 }
 
-
+// Text field delegate methods
 extension ViewController: UITextFieldDelegate {
-
     // Limit text field lenght to 4 digits
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard let text = textField.text else { return true }
-
         let newLength = text.count + string.count - range.length
-
         return newLength <= 4 // Bool
     }
 }
 
-
+// Transition Delegate methods
 extension ViewController: UIViewControllerTransitioningDelegate {
     
+    // For presenting
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return animator
     }
     
+    // For dismissing
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-
         return nil
     }
-    
 }

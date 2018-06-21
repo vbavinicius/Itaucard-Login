@@ -11,7 +11,7 @@ import UIKit
 class TransitionObject: NSObject, UIViewControllerAnimatedTransitioning {
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return 1.4
+        return 1.2
     }
     
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
@@ -25,13 +25,11 @@ class TransitionObject: NSObject, UIViewControllerAnimatedTransitioning {
         containerView.bringSubview(toFront: fromView)
         containerView.addSubview(toView)
         containerView.sendSubview(toBack: toView)
-        
-        fromVC.activityIndicator.removeFromSuperview()
     
         let scaleFactor = (fromVC.view.frame.height / fromVC.loginButton.frame.height) * 2
         
         // Start animation
-        UIView.animateKeyframes(withDuration: 1.4, delay: 0, options: UIViewKeyframeAnimationOptions.calculationModeLinear, animations: {
+        UIView.animateKeyframes(withDuration: 1.2, delay: 0, options: UIViewKeyframeAnimationOptions.calculationModeLinear, animations: {
             
             UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.3, animations: {
                 fromVC.loginButton.transform = CGAffineTransform(scaleX: scaleFactor, y: scaleFactor)
@@ -48,7 +46,10 @@ class TransitionObject: NSObject, UIViewControllerAnimatedTransitioning {
         }) { (_) in
 
             fromView.alpha = 1.0
+            fromVC.loginButton.transform = .identity
+            fromVC.loginButton.backgroundColor = UIColor(red: 246/255, green: 94/255, blue: 1/255, alpha: 1)
             fromVC.resetToInitialState()
+            fromVC.isEditingTextField = false
             transitionContext.completeTransition(true)
         }
     }
